@@ -658,10 +658,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 5
-  gravity: -9.81
+  gravity: -20
   jumpHeight: 2
   cameraHolder: {fileID: 2064044253}
-  mouseSensitivity: 100
+  mouseSensitivity: 0.05
   verticalClamp: 85
 --- !u!143 &1034906746
 CharacterController:
