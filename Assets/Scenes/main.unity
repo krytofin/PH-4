@@ -660,8 +660,8 @@ MonoBehaviour:
   walkSpeed: 5
   sprintSpeed: 8
   acceleration: 10
-  gravity: -20
-  jumpHeight: 2
+  gravity: -30
+  jumpHeight: 1.6
   maxStamina: 50
   staminaDepletionRate: 5
   staminaRegenRate: 5
