@@ -16,7 +16,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float staminaDepletionRate = 20f;
     [SerializeField] private float staminaRegenRate = 15f;
     [SerializeField] private float staminaRegenDelay = 2f;
-    [SerializeField] private Image staminaFill;
+    [SerializeField] private Image staminaBar;
+    [SerializeField] private CanvasGroup staminaBarGroup;
+    [SerializeField] private float fadeSpeed = 3f;
 
     [Header("Mouse Look")]
     [SerializeField] private Transform cameraHolder;
@@ -45,6 +47,7 @@ public class PlayerMovement : MonoBehaviour
     
     private float currentStamina;
     private float staminaRegenTimer;
+    private bool wasStaminaFull = true;
 
     private void Awake()
     {
@@ -53,6 +56,12 @@ public class PlayerMovement : MonoBehaviour
         playerCamera = cameraHolder.GetComponentInChildren<Camera>();
         normalFOV = playerCamera.fieldOfView;
         currentStamina = maxStamina;
+
+        // Initialize UI elements
+        if (staminaBarGroup != null)
+        {
+            staminaBarGroup.alpha = 1f;
+        }
     }
 
     private void OnEnable()
@@ -86,6 +95,7 @@ public class PlayerMovement : MonoBehaviour
         HandleLook();
         HandleSprintEffects();
         HandleStamina();
+        HandleStaminaBarVisibility();
     }
 
     private void HandleMovement()
@@ -196,16 +206,54 @@ public class PlayerMovement : MonoBehaviour
 
     private void UpdateStaminaUI()
     {
-        if (staminaFill != null)
+        if (staminaBar != null && staminaBarGroup != null)
         {
-            staminaFill.fillAmount = currentStamina / maxStamina;
+            staminaBar.fillAmount = currentStamina / maxStamina;
             
             if (currentStamina < maxStamina * 0.3f)
-                staminaFill.color = Color.red;
+                staminaBar.color = Color.red;
             else if (currentStamina < maxStamina * 0.6f)
-                staminaFill.color = Color.yellow;
+                staminaBar.color = Color.yellow;
             else
-                staminaFill.color = Color.green;
+                staminaBar.color = Color.green;
+        }
+    }
+
+    private void HandleStaminaBarVisibility()
+    {
+        if (staminaBarGroup == null) return;
+        
+        bool isStaminaFullNow = Mathf.Approximately(currentStamina, maxStamina);
+        
+        // Если состояние изменилось (полная/не полная)
+        if (isStaminaFullNow != wasStaminaFull)
+        {
+            wasStaminaFull = isStaminaFullNow;
+            
+            if (isStaminaFullNow && !isSprinting)
+            {
+                StartCoroutine(FadeStaminaBar(0f));
+            }
+            else
+            {
+                StopAllCoroutines();
+                StartCoroutine(FadeStaminaBar(1f));
+            }
+        }
+    }
+
+    private System.Collections.IEnumerator FadeStaminaBar(float targetAlpha)
+    {
+        if (staminaBarGroup == null) yield break;
+        
+        while (!Mathf.Approximately(staminaBarGroup.alpha, targetAlpha))
+        {
+            staminaBarGroup.alpha = Mathf.MoveTowards(
+                staminaBarGroup.alpha, 
+                targetAlpha, 
+                fadeSpeed * Time.deltaTime
+            );
+            yield return null;
         }
     }
 }
