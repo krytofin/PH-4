@@ -24,6 +24,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private Transform cameraHolder;
     [SerializeField] private float mouseSensitivity = 0.5f;
     [SerializeField] private float verticalClamp = 70f;
+    [SerializeField] private Vector3 cameraOffset = new Vector3(0f, 0.6f, 0f);
 
     [Header("Sprint Effects")]
     [SerializeField] private float sprintFOV = 70f;
@@ -56,6 +57,14 @@ public class PlayerMovement : MonoBehaviour
         playerCamera = cameraHolder.GetComponentInChildren<Camera>();
         normalFOV = playerCamera.fieldOfView;
         currentStamina = maxStamina;
+
+        // Set camera near clip plane to prevent seeing through objects
+        if (playerCamera != null)
+        {
+            playerCamera.nearClipPlane = 0.1f;
+            // Apply camera offset
+            cameraHolder.localPosition = cameraOffset;
+        }
 
         // Initialize UI elements
         if (staminaBarGroup != null)
